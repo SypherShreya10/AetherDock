@@ -14,3 +14,10 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });
+
+const Docker = require('dockerode');
+const docker = new Docker(); // connects to local Docker
+app.get("/containers", async (req,res)=>{
+  const list = await docker.listContainers({ all: true });
+  res.json(list);
+});
