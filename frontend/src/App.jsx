@@ -1,18 +1,25 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { io } from 'socket.io-client';
+import ContainerList from './components/ContainerList';
+
+const socket = io('http://localhost:5000'); // direct; proxy also supports
 
 function App() {
-  const [message, setMessage] = useState("");
+  const [containers, setContainers] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/")
-      .then(res => res.json())
-      .then(data => setMessage(data.message));
+    // initial fetch
+    axios.get('/api/containers').then(res => setContainers(res.data)).catch(() => {});
+    // listen for live updates
+    socket.on('containers:update', (list) => setContainers(list));
+    return () => { socket.disconnect(); };
   }, []);
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "Arial" }}>
-      <h1>AetherDock 🚀</h1>
-      <p>Backend says: {message}</p>
+    <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
+      <h1>AetherDock — Containers</h1>
+      <ContainerList containers={containers} socket={socket} />
     </div>
   );
 }
