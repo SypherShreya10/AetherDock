@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div style={{ padding: "2rem", fontFamily: "Arial" }}>
-      <h1>AetherDock</h1>
+      <h1>AetherDock 🚀</h1>
       <p>Backend says: {message}</p>
     </div>
   );
