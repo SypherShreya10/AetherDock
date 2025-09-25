@@ -1,50 +1,47 @@
-import React, { useState } from 'react';
-import LogsViewer from './LogsViewer';
-import axios from 'axios';
+import React from "react";
+import axios from "axios";
 
-export default function ContainerList({ containers, socket }) {
-  const [selectedLogs, setSelectedLogs] = useState(null);
+const badgeStyle = (state) => ({
+  display: "inline-block",
+  padding: "2px 8px",
+  borderRadius: "12px",
+  color: "white",
+  background: state === "running" ? "green" : "red",
+});
 
-  const control = async (id, action) => {
+const ContainerList = ({ containers }) => {
+  const handleAction = async (id, action) => {
     try {
       await axios.post(`/api/containers/${id}/${action}`);
-      // optional: refetch or rely on socket updates
-    } catch (e) {
-      alert('Action failed: ' + (e?.response?.data?.error || e.message));
+    } catch (err) {
+      console.error(`Error on ${action}:`, err);
     }
   };
 
   return (
     <div>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={{ textAlign: 'left' }}>Name / Image</th>
-            <th>Status</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {containers.map(c => (
-            <tr key={c.Id}>
-              <td>{c.Names?.[0]?.replace('/','') || c.Image}</td>
-              <td>{c.State} {c.Status}</td>
-              <td>
-                <button onClick={() => control(c.Id, 'start')}>Start</button>
-                <button onClick={() => control(c.Id, 'stop')}>Stop</button>
-                <button onClick={() => control(c.Id, 'restart')}>Restart</button>
-                <button onClick={() => setSelectedLogs(c.Id)}>View Logs</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {selectedLogs && (
-        <div style={{ marginTop: 20 }}>
-          <h3>Logs for {selectedLogs}</h3>
-          <LogsViewer containerId={selectedLogs} socket={socket} onClose={() => setSelectedLogs(null)} />
+      {containers.map((c) => (
+        <div
+          key={c.Id}
+          style={{
+            margin: "10px 0",
+            padding: "10px",
+            border: "1px solid #ccc",
+            borderRadius: 6,
+          }}
+        >
+          <h3>{c.Names?.[0] || c.Id.slice(0, 12)}</h3>
+          <p>
+            Status: <span style={badgeStyle(c.State)}>{c.State}</span>
+          </p>
+          <button onClick={() => handleAction(c.Id, "start")}>Start</button>
+          <button onClick={() => handleAction(c.Id, "stop")}>Stop</button>
+          <button onClick={() => handleAction(c.Id, "restart")}>Restart</button>
         </div>
-      )}
-    </div>
-  );
-}
+      ))}
+    </div>
+  );
+};
+
+export default ContainerList;
+
