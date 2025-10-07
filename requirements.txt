@@ -1,0 +1,10 @@
+Flask>=2.0
+docker>=6.0
+pandas
+numpy
+scikit-learn
+SQLAlchemy
+plotly
+flask-socketio
+python-dotenv
+pytest
