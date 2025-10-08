@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>AetherDock — Demo</title>
+</head>
+<body>
+  <h1>AetherDock — Starter Dashboard</h1>
+  <div id="containers">Loading containers...</div>
+  <script>
+    fetch('/api/containers').then(r => r.json()).then(data => {
+      const el = document.getElementById('containers');
+      if (data.length === 0) el.innerText = 'No containers found';
+      else {
+        el.innerHTML = '<ul>' + data.map(c => `<li><b>${c.name}</b> (${c.id}) — ${c.status} — ${c.image}</li>`).join('') + '</ul>';
+      }
+    }).catch(err => {
+      document.getElementById('containers').innerText = 'Failed to fetch containers: ' + err;
+    });
+  </script>
+</body>
+</html>
